@@ -20,8 +20,9 @@ connection.connect(function (error) {
     console.log("connected as id " + connection.threadId + "\n"); showProducts();
 });
 
-function purchase (product, quantity){
-    connection.query("UPDATE products SET stock_quantity - ? where item_id = ?", [quantity, product.item_id], function(err, res) {
+function purchase (product, quantity, price){
+    connection.query("UPDATE products SET stock_quantity = stock_quantity - ? where item_id = ?", [quantity, product.item_id], function(err, res) {
+    console.log("Your total cost is $" + quantity * price)
         console.log("You just purchased  ", product.product_name)
         showProducts()
     })
@@ -29,6 +30,7 @@ function purchase (product, quantity){
 
 function showProducts() {
     connection.query("SELECT * FROM products", function (error, res) {
+        
         if (error) throw error;
 
         console.table(res);
@@ -39,6 +41,7 @@ function showProducts() {
 }
 
 function promptCustomer(item) {
+//    console.log(item)
     inquirer.prompt([
         {
             type: "input",
@@ -54,7 +57,7 @@ function promptCustomer(item) {
                 console.log("Come back again soon!")
                 process.exit(0)
             }
-
+ var price = item [answer.buy].price;
             var holdId = parseInt(answer.buy);
             var product = checkDb(holdId, item);
 
@@ -79,7 +82,9 @@ function promptCustomer(item) {
 
                         }
                         else {
-                            purchase(product, quantity)
+                            purchase(product, quantity, price)
+
+
                         }
                     })
 
@@ -100,5 +105,6 @@ function promptCustomer(item) {
         return null;
     }
 
-    
+    //need to add price and inventory and I just cant figure it out I will go to class to see or meet again with my tutor
+
 }
